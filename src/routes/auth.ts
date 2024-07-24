@@ -3,6 +3,7 @@ import { Router, Request, Response } from 'express';
 import { compare } from 'bcrypt';
 
 import jwt from 'jsonwebtoken';
+import passport from 'passport';
 
 import usersModel from '../db/usersModel';
 
@@ -54,11 +55,21 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       const token = jwt.sign({ id: user._id },
         process.env.JWT_SECRET || '',
         { expiresIn: "1h" });
-      return res.json({ token })
+      return res.cookie('token', token, { httpOnly: true, secure: true, signed: true, maxAge: 3600000 }).
+      json({ message: "Logged in successfully." })
+        
     })
   } catch {
     return res.status(500).json({ message: 'Internal Server Error.' })
   }
 })
 
+authRouter.get("/authenticated", passport.authenticate("jwt", { session: false }),
+  async (req: Request, res: Response) => {
+    try {
+      return res.status(200).json({ message: "Authenticated." })
+    } catch {
+      return res.status(500).json({ message: 'Internal Server Error.' })
+    }
+  })
 export default authRouter

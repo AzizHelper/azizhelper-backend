@@ -1,8 +1,10 @@
-import { Strategy, ExtractJwt } from 'passport-jwt'
+import express from 'express'
+import { Strategy, } from 'passport-jwt'
 import usersModel from "./db/usersModel";
 
+
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: (req: express.Request) => req?.signedCookies?.token,
   secretOrKey: process.env.JWT_SECRET || ''
 };
 
