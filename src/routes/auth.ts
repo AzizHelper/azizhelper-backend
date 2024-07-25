@@ -40,8 +40,8 @@ authRouter.post("/register", async (req: Request, res: Response) => {
 
 authRouter.post("/login", async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
-    if (!name || !email || !password) {
+    const {email, password } = req.body
+    if (!email || !password) {
       return res.status(422).json({ message: "Invalid request." })
     }
     const user = await usersModel.findOne({ email: email })
@@ -57,7 +57,6 @@ authRouter.post("/login", async (req: Request, res: Response) => {
         { expiresIn: "1h" });
       return res.cookie('token', token, { httpOnly: true, secure: true, signed: true, maxAge: 3600000 }).
       json({ message: "Logged in successfully." })
-        
     })
   } catch {
     return res.status(500).json({ message: 'Internal Server Error.' })
@@ -72,4 +71,5 @@ authRouter.get("/authenticated", passport.authenticate("jwt", { session: false }
       return res.status(500).json({ message: 'Internal Server Error.' })
     }
   })
+  
 export default authRouter
