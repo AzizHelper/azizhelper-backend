@@ -1,7 +1,6 @@
 import express from 'express'
-import { Strategy, } from 'passport-jwt'
+import { Strategy } from 'passport-jwt'
 import usersModel from "./db/usersModel";
-
 
 const jwtOptions = {
   jwtFromRequest: (req: express.Request) => req?.signedCookies?.token,

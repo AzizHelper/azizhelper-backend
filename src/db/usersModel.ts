@@ -1,9 +1,12 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { hash } from 'bcrypt'
 const usersSchema = new mongoose.Schema({
-  _id: { type: Schema.Types.ObjectId, default: new mongoose.Types.ObjectId() },
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId()
+  },
   name: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true }
 }, { collection: 'users' });
 
