@@ -16,5 +16,14 @@ usersSchema.pre('save', async function (next) {
   next()
 })
 
+usersSchema.pre(['updateOne', 'findOneAndUpdate'], async function (next) {
+  const update = this.getUpdate() as { password?: string };
+  if (update.password) {
+    const hashedPassword = await hash(update.password, 10);
+    update.password = hashedPassword;
+  }
+  next();
+});
+
 const usersModel = mongoose.model('users', usersSchema);
 export default usersModel
