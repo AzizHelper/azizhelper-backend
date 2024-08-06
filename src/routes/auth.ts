@@ -31,11 +31,17 @@ authRouter.post("/register", async (req: Request, res: Response) => {
     if (userExists) {
       return res.status(409).json({ message: "A User with this email already exists." });
     }
-    await usersModel.create({
+    const user = await usersModel.create({
       name: name,
       email: email,
       password: password,
     });
+    mail.sendMail({
+      from: process.env.MAIL_SENDER,
+      to: email,
+      subject: 'AzizHelper - Verify Email',
+      text: `Click on the link to verify your email: ${process.env.CLIENT_URL}/verify-email/${user._id}`
+    })
     return res.status(201).json({ message: "User created." });
   } catch {
     return res.status(500).json({ message: "Internal Server Error." })
@@ -142,5 +148,44 @@ authRouter.post("/reset-password", async (req: Request, res: Response) => {
   }
 })
 
+authRouter.post("/resend-verification-email", passport.authenticate("jwt"),
+  async (req: Request["body"], res: Response) => {
+    try {
+      const user = await usersModel.findOne({ _id: req.user.id })
+      if (!user) {
+        return res.status(404).json({ message: "User not found." })
+      }
+      if (user.isVerified) {
+        return res.status(409).json({ message: "Email already verified." })
+      }
+      mail.sendMail({
+        from: process.env.MAIL_SENDER,
+        to: user.email,
+        subject: 'AzizHelper - Verify Email',
+        text: `Click on the link to verify your email: ${process.env.CLIENT_URL}/verify-email/${user._id}`
+      })
+      return res.status(200).json({ message: "Verification email sent." })
+    } catch {
+      return res.status(500).json({ message: "Internal Server Error." })
+    }
+  })
+
+
+authRouter.get("/verify-email/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const user = await usersModel.findOne({ _id: id })
+    if (!user) {
+      return res.status(404).json({ message: "User not found." })
+    }
+    if (user.isVerified) {
+      return res.status(409).json({ message: "Email already verified." })
+    }
+    await usersModel.updateOne({ _id: id }, { isVerified: true })
+    return res.status(200).json({ message: "Email verified." })
+  } catch {
+    return res.status(500).json({ message: "Internal Server Error." })
+  }
+})
 
 export default authRouter
