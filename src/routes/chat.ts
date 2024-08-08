@@ -6,18 +6,18 @@ import conversationModel from '../db/ConversationModel';
 
 import chat from '../utils/openai';
 
+import { validateData } from '../middleware/validationMiddleware';
+import { sendMessageSchema } from '../schemas/chatSchema';
+
 const chatRouter: Router = Router();
 
 chatRouter.post("/sendMessage", passport.authenticate('jwt', { session: false }),
-  async (req: Request["body"], res: Response) => {
+  validateData(sendMessageSchema), async (req: Request["body"], res: Response) => {
     try {
 
-      // Extract info and validate it
+      // Extract info
       const userId = req.user._id
       const { chatId, userMessage } = req.body
-      if (!chatId || !userMessage) {
-        return res.status(422).json({ message: "Invalid request." })
-      }
 
       // Create a new conversation if it doesn't exist and save the user message
       let conversation = await conversationModel.findOne({ userId, chatId })
@@ -48,9 +48,9 @@ chatRouter.post("/sendMessage", passport.authenticate('jwt', { session: false })
 
       return res.json({ assistantMessage });
 
-    } catch(err) {
+    } catch (err) {
       return res.status(500).json({ message: "Internal Server Error." })
     }
   })
 
-  export default chatRouter
+export default chatRouter
