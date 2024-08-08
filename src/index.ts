@@ -6,6 +6,7 @@ import cors from 'cors';
 import 'dotenv/config'
 
 import authRouter from './routes/auth';
+import chatRouter from './routes/chat';
 
 import passport from 'passport';
 import jwtAuth from './jwtAuth';
@@ -21,6 +22,7 @@ app.use(passport.initialize())
 app.use(cookieParser(process.env.JWT_SECRET || ''))
 
 app.use('/auth', authRouter)
+app.use('/chat', chatRouter)
 
 async function main() {
   passport.use(jwtAuth)
