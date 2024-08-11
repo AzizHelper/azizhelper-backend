@@ -2,12 +2,12 @@ import { Router, Request, Response } from 'express';
 
 import passport from 'passport';
 
-import conversationModel from '../db/ConversationModel';
+import conversationModel from '../db/conversationModel';
 
 import chat from '../utils/openai';
 
 import { validateData } from '../middleware/validationMiddleware';
-import { sendMessageSchema } from '../schemas/chatSchema';
+import { getChatSchema, sendMessageSchema } from '../schemas/chatSchema';
 
 const chatRouter: Router = Router();
 
@@ -48,6 +48,18 @@ chatRouter.post("/sendMessage", passport.authenticate('jwt', { session: false })
 
       return res.json({ assistantMessage });
 
+    } catch (err) {
+      return res.status(500).json({ message: "Internal Server Error." })
+    }
+  })
+
+chatRouter.post("/getChat", passport.authenticate('jwt', { session: false }), 
+  validateData(getChatSchema), async (req: Request["body"], res: Response) => {
+    try {
+      const { chatId } = req.body
+      const userId = req.user._id
+      const conversations = await conversationModel.findOne({ userId: userId, chatId: chatId })
+      return res.json(conversations?.messages || []);
     } catch (err) {
       return res.status(500).json({ message: "Internal Server Error." })
     }
