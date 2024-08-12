@@ -56,8 +56,7 @@ authRouter.post("/login", validateData(userLoginSchema),
         const token = jwt.sign({ id: user._id },
           process.env.JWT_SECRET || '',
           { expiresIn: "1h" });
-        return res.cookie('token', token, { httpOnly: true, secure: true, signed: true, maxAge: 3600000 }).
-          json({ message: "Logged in successfully." })
+        return res.json({ token: token })
       })
     } catch {
       return res.status(500).json({ message: "Internal Server Error." })
