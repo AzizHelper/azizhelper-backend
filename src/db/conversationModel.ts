@@ -11,7 +11,7 @@ const conversationSchema = new mongoose.Schema({
       timestamp: { type: Date, default: Date.now }
     }
   ]
-})
+}, {_id: false})
 
 const conversationModel = mongoose.model('Conversation', conversationSchema)
 export default conversationModel
