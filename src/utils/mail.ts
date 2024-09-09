@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 const mail = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -10,4 +10,4 @@ const mail = nodemailer.createTransport({
   },
 });
 
-export default mail
+export default mail;
