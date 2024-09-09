@@ -9,8 +9,8 @@ import usersModel from "../db/usersModel";
 
 const profileRouter: Router = Router();
 
-profileRouter.post(
-  "/updateUserInfo",
+profileRouter.put(
+  "/",
   validateData(updateUserInfoSchema),
   passport.authenticate("jwt", { session: false }),
   async (req: Request["body"], res: Response) => {
@@ -38,7 +38,7 @@ profileRouter.post(
 );
 
 profileRouter.get(
-  "/getUserInfo",
+  "/",
   passport.authenticate("jwt", { session: false }),
   async (req: Request["body"], res: Response) => {
     try {

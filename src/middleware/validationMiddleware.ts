@@ -3,7 +3,8 @@ import { z, ZodError } from 'zod';
 export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse(req.body)
+      const combinedData = { ...req.body, ...req.params, ...req.query };
+      schema.parse(combinedData)
       next()
     } catch (error) {
       if (error instanceof ZodError) {
